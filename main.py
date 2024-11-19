@@ -3,6 +3,21 @@ import yt_dlp
 from discord.ext import commands
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import argparse
+
+
+# ArgParser to get and use YT-DLP's --cookies, if preferred by the user.
+# The correct usage can be found at: https://github.com/yt-dlp/yt-dlp#filesystem-options
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-c", "--cookies",
+    type=str,
+    help="Path to the cookies.txt file (optional).",
+    default=None
+)
+args = parser.parse_args()
+
+path_to_cookies = args.cookies # Receives 'None', if no path is specified.
 
 
 intents = discord.Intents.default()
@@ -55,7 +70,8 @@ async def search_video(ctx, urlq):
                 }],
                 'default_search': 'auto',
                 'noplaylist': True,
-                'verbose': True
+                'verbose': True,
+                'cookiefile': path_to_cookies # 'None', if blank.
     }
     yt_search = yt_dlp.YoutubeDL(yt_opts)
     loop = asyncio.get_event_loop()
@@ -84,7 +100,8 @@ async def playlist(ctx, urlq):
             'noplaylist': False,
             'ignoreerrors': True,
             'flat_playlist': True,
-            'verbose': True
+            'verbose': True,
+            'cookiefile': path_to_cookies # 'None', if blank.
 }
     playlist_search = yt_dlp.YoutubeDL(pl_opts)
     loop = asyncio.get_event_loop()
